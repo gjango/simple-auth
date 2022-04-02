@@ -1,9 +1,21 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import styled from 'styled-components'
+import AuthContext from '../../contexts/AuthContext'
+import { useNavigate, Navigate } from 'react-router-dom'
 
 const Login = () => {
+  const { authenticate, client } = useContext(AuthContext)
+  const navigate = useNavigate()
+
   const [form, setForm] = useState({ email: '', password: '' })
-  return (
+  const handleLogin = () => {
+    if (!form.email || !form.password) return
+    authenticate()
+    navigate('/')
+  }
+  return client.isAuthenticated ? (
+    <Navigate to={'/'} />
+  ) : (
     <Container>
       <Wrapper>
         <TextInput
@@ -16,7 +28,9 @@ const Login = () => {
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
         />
-        <LoginButton>Login</LoginButton>
+        <LoginButton onClick={handleLogin} disabled={!form.email || !form.password}>
+          Login
+        </LoginButton>
       </Wrapper>
     </Container>
   )
@@ -26,7 +40,7 @@ const Container = styled.div`
   height: 100vh;
   width: 100vw;
   background-image: url('https://wallpapercave.com/wp/wp7911644.jpg');
-  background-size: cover;
+  background-size: 100vw 100vh;
 `
 
 const Wrapper = styled.div`
@@ -69,7 +83,8 @@ const LoginButton = styled.div`
   align-items: center;
   justify-content: center;
   color: white;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
+  opacity: ${(props) => (props.disabled ? 0.7 : 1)};
 `
 
 export default Login
